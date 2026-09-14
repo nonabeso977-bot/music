@@ -1,406 +1,209 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+let audioContext = null;
+let masterGain = null;
+let compressor = null;
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+let musicPlaying = false;
+let musicTimer = null;
 
-  <title>Music</title>
+let currentMood = 0;
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: #fffaf5;
-      color: #777;
+// إعدادات المزاج الأربعة
+const moodSettings = [
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+  // 🌿 هادئ
+  {
+    notes: [261.63, 329.63, 392.00, 523.25],
+    speed: 1800
+  },
 
-    .app {
-      width: 100%;
-      max-width: 390px;
-      min-height: 100vh;
+  // 🌧️ حزين
+  {
+    notes: [220.00, 261.63, 293.66, 349.23],
+    speed: 2300
+  },
 
-      padding: 35px 25px;
+  // ☀️ سعيد
+  {
+    notes: [329.63, 392.00, 440.00, 523.25, 659.25],
+    speed: 850
+  },
 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+  // 🌙 متوتر
+  {
+    notes: [261.63, 293.66, 329.63],
+    speed: 2600
+  }
 
-    .logo {
-      margin-top: 25px;
+];
 
-      font-size: 34px;
-      font-weight: bold;
-      letter-spacing: 5px;
 
-      color: #777;
-    }
+// تشغيل الموسيقى
+function startMusic(mood = 0) {
 
-    .subtitle {
-      margin-top: 8px;
+  if (musicPlaying) return;
 
-      font-size: 14px;
-      color: #aaa;
-    }
+  currentMood = mood;
 
-    .player {
-      width: 100%;
+  audioContext =
+    new (window.AudioContext ||
+      window.webkitAudioContext)();
 
-      margin-top: 60px;
 
-      padding: 25px 20px;
+  // معالجة الصوت
+  compressor =
+    audioContext.createDynamicsCompressor();
 
-      border-radius: 25px;
+  compressor.threshold.value = -18;
+  compressor.knee.value = 8;
+  compressor.ratio.value = 6;
+  compressor.attack.value = 0.003;
+  compressor.release.value = 0.25;
 
-      background: #fff0c9;
 
-      text-align: center;
-    }
+  // مستوى الصوت الرئيسي
+  masterGain =
+    audioContext.createGain();
 
-    .kalimba {
-      width: 150px;
-      height: 150px;
+  masterGain.gain.value = 0.5;
 
-      margin: 0 auto 25px;
 
-      border-radius: 50%;
+  masterGain.connect(compressor);
 
-      background: #f2cf91;
+  compressor.connect(
+    audioContext.destination
+  );
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
 
-      font-size: 55px;
+  // بعض المتصفحات توقف الصوت تلقائيًا
+  // حتى يحصل تفاعل من المستخدم
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
 
-      box-shadow:
-        0 12px 30px rgba(0, 0, 0, 0.08);
-    }
 
-    .mood {
-      font-size: 22px;
-      color: #777;
+  musicPlaying = true;
 
-      margin-bottom: 8px;
-    }
+  playKalimba();
 
-    .description {
-      font-size: 14px;
-      color: #aaa;
-    }
+}
 
-    .controls {
-      display: flex;
 
-      justify-content: center;
-      align-items: center;
+// توليد نغمة كاليمبا
+function playKalimba() {
 
-      gap: 15px;
+  if (!musicPlaying || !audioContext) {
+    return;
+  }
 
-      margin-top: 30px;
-    }
 
-    .control {
-      width: 50px;
-      height: 50px;
-
-      border: none;
-      border-radius: 50%;
-
-      background: #b9d8c2;
-
-      color: white;
-
-      font-size: 20px;
-
-      cursor: pointer;
-    }
-
-    .play {
-      width: 65px;
-      height: 65px;
-
-      background: #f2cf91;
-
-      font-size: 25px;
-    }
-
-    .status {
-      margin-top: 20px;
-
-      font-size: 13px;
-      color: #aaa;
-    }
-
-    .moods {
-      width: 100%;
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 12px;
-
-      margin-top: 25px;
-    }
-
-    .moodButton {
-      border: none;
-
-      padding: 15px 10px;
-
-      border-radius: 18px;
-
-      background: #f4e6d8;
-
-      color: #777;
-
-      font-size: 15px;
-
-      cursor: pointer;
-    }
-
-    .moodButton:active,
-    .control:active {
-      transform: scale(0.95);
-    }
-
-    .footer {
-      margin-top: auto;
-
-      padding-top: 40px;
-
-      font-size: 12px;
-
-      color: #bbb;
-    }
-  </style>
-</head>
-
-
-<body>
-
-  <div class="app">
-
-    <div>
-      <div class="logo">
-        MUSIC
-      </div>
-
-      <div class="subtitle">
-        موسيقى على حسب مزاجك
-      </div>
-    </div>
-
-
-    <div class="player">
-
-      <div class="kalimba">
-        ♫
-      </div>
-
-
-      <div class="mood" id="mood">
-        هادئ
-      </div>
-
-
-      <div class="description" id="description">
-        نغمات كاليمبا هادئة
-      </div>
-
-
-      <div class="controls">
-
-        <button
-          class="control"
-          onclick="previousMood()">
-          ‹
-        </button>
-
-
-        <button
-          class="control play"
-          id="playButton"
-          onclick="toggleMusic()">
-          ▶
-        </button>
-
-
-        <button
-          class="control"
-          onclick="nextMood()">
-          ›
-        </button>
-
-      </div>
-
-
-      <div class="status" id="status">
-        الموسيقى متوقفة
-      </div>
-
-    </div>
-
-
-    <div class="moods">
-
-      <button
-        class="moodButton"
-        onclick="selectMood(0)">
-        🌿 هادئ
-      </button>
-
-
-      <button
-        class="moodButton"
-        onclick="selectMood(1)">
-        🌧️ حزين
-      </button>
-
-
-      <button
-        class="moodButton"
-        onclick="selectMood(2)">
-        ☀️ سعيد
-      </button>
-
-
-      <button
-        class="moodButton"
-        onclick="selectMood(3)">
-        🌙 متوتر
-      </button>
-
-    </div>
-
-
-    <div class="footer">
-      MUSIC
-    </div>
-
-  </div>
-
-
-  <!-- ملف الموسيقى -->
-  <script src="music.js"></script>
-
-
-  <script>
-
-    const moods = [
-      {
-        name: "هادئ",
-        description: "نغمات كاليمبا هادئة"
-      },
-
-      {
-        name: "حزين",
-        description: "نغمات كاليمبا ناعمة وبطيئة"
-      },
-
-      {
-        name: "سعيد",
-        description: "نغمات كاليمبا مشرقة وخفيفة"
-      },
-
-      {
-        name: "متوتر",
-        description: "نغمات كاليمبا بطيئة ومريحة"
-      }
+  const settings =
+    moodSettings[currentMood];
+
+
+  const note =
+    settings.notes[
+      Math.floor(
+        Math.random() *
+        settings.notes.length
+      )
     ];
 
 
-    let currentMood = 0;
+  const oscillator =
+    audioContext.createOscillator();
 
 
-    function selectMood(index) {
-
-      currentMood = index;
-
-      document.getElementById("mood").textContent =
-        moods[index].name;
-
-      document.getElementById("description").textContent =
-        moods[index].description;
+  const gain =
+    audioContext.createGain();
 
 
-      if (typeof changeMood === "function") {
-        changeMood(index);
-      }
+  // شكل الموجة
+  oscillator.type = "sine";
 
-    }
-
-
-    function nextMood() {
-
-      currentMood++;
-
-      if (currentMood >= moods.length) {
-        currentMood = 0;
-      }
-
-      selectMood(currentMood);
-
-    }
+  oscillator.frequency.value =
+    note;
 
 
-    function previousMood() {
-
-      currentMood--;
-
-      if (currentMood < 0) {
-        currentMood = moods.length - 1;
-      }
-
-      selectMood(currentMood);
-
-    }
+  const now =
+    audioContext.currentTime;
 
 
-    function toggleMusic() {
-
-      const button =
-        document.getElementById("playButton");
-
-      const status =
-        document.getElementById("status");
+  // بداية النغمة
+  gain.gain.setValueAtTime(
+    0.001,
+    now
+  );
 
 
-      if (typeof musicPlaying !== "undefined" && musicPlaying) {
+  gain.gain.exponentialRampToValueAtTime(
+    0.35,
+    now + 0.015
+  );
 
-        stopMusic();
 
-        button.textContent = "▶";
+  // رنين الكاليمبا
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    now + 2.8
+  );
 
-        status.textContent =
-          "الموسيقى متوقفة";
 
-      } else {
+  oscillator.connect(gain);
 
-        startMusic(currentMood);
+  gain.connect(masterGain);
 
-        button.textContent = "⏸";
 
-        status.textContent =
-          "الموسيقى تعمل";
+  oscillator.start(now);
 
-      }
+  oscillator.stop(
+    now + 2.8
+  );
 
-    }
 
-  </script>
+  musicTimer =
+    setTimeout(
+      playKalimba,
+      settings.speed
+    );
 
-</body>
+}
 
-</html>
+
+// تغيير المزاج
+function changeMood(mood) {
+
+  currentMood = mood;
+
+
+  if (musicPlaying) {
+
+    clearTimeout(musicTimer);
+
+    playKalimba();
+
+  }
+
+}
+
+
+// إيقاف الموسيقى
+function stopMusic() {
+
+  musicPlaying = false;
+
+
+  clearTimeout(musicTimer);
+
+  musicTimer = null;
+
+
+  if (audioContext) {
+
+    audioContext.close();
+
+    audioContext = null;
+
+  }
+
+}
