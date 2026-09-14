@@ -8,6 +8,7 @@
   <title>Music</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -15,13 +16,14 @@
     body {
       margin: 0;
       min-height: 100vh;
+
       font-family: Arial, sans-serif;
+
       background: #fffaf5;
       color: #777;
 
       display: flex;
       justify-content: center;
-      align-items: center;
     }
 
     .app {
@@ -37,10 +39,11 @@
     }
 
     .logo {
-      margin-top: 25px;
+      margin-top: 20px;
 
       font-size: 34px;
       font-weight: bold;
+
       letter-spacing: 5px;
 
       color: #777;
@@ -50,13 +53,14 @@
       margin-top: 8px;
 
       font-size: 14px;
+
       color: #aaa;
     }
 
     .player {
       width: 100%;
 
-      margin-top: 60px;
+      margin-top: 55px;
 
       padding: 25px 20px;
 
@@ -89,6 +93,7 @@
 
     .mood {
       font-size: 22px;
+
       color: #777;
 
       margin-bottom: 8px;
@@ -96,6 +101,7 @@
 
     .description {
       font-size: 14px;
+
       color: #aaa;
     }
 
@@ -110,11 +116,18 @@
       margin-top: 30px;
     }
 
+    button {
+      border: none;
+
+      cursor: pointer;
+
+      font-family: Arial, sans-serif;
+    }
+
     .control {
       width: 50px;
       height: 50px;
 
-      border: none;
       border-radius: 50%;
 
       background: #b9d8c2;
@@ -122,8 +135,6 @@
       color: white;
 
       font-size: 20px;
-
-      cursor: pointer;
     }
 
     .play {
@@ -139,6 +150,7 @@
       margin-top: 20px;
 
       font-size: 13px;
+
       color: #aaa;
     }
 
@@ -155,8 +167,6 @@
     }
 
     .moodButton {
-      border: none;
-
       padding: 15px 10px;
 
       border-radius: 18px;
@@ -166,12 +176,9 @@
       color: #777;
 
       font-size: 15px;
-
-      cursor: pointer;
     }
 
-    .moodButton:active,
-    .control:active {
+    button:active {
       transform: scale(0.95);
     }
 
@@ -184,6 +191,7 @@
 
       color: #bbb;
     }
+
   </style>
 </head>
 
@@ -192,7 +200,9 @@
 
   <div class="app">
 
+
     <div>
+
       <div class="logo">
         MUSIC
       </div>
@@ -200,27 +210,36 @@
       <div class="subtitle">
         موسيقى على حسب مزاجك
       </div>
+
     </div>
 
 
+
     <div class="player">
+
 
       <div class="kalimba">
         ♫
       </div>
 
 
-      <div class="mood" id="mood">
+      <div
+        class="mood"
+        id="mood">
         هادئ
       </div>
 
 
-      <div class="description" id="description">
+      <div
+        class="description"
+        id="description">
         نغمات كاليمبا هادئة
       </div>
 
 
+
       <div class="controls">
+
 
         <button
           class="control"
@@ -243,17 +262,23 @@
           ›
         </button>
 
+
       </div>
 
 
-      <div class="status" id="status">
+      <div
+        class="status"
+        id="status">
         الموسيقى متوقفة
       </div>
+
 
     </div>
 
 
+
     <div class="moods">
+
 
       <button
         class="moodButton"
@@ -282,23 +307,24 @@
         🌙 متوتر
       </button>
 
+
     </div>
+
 
 
     <div class="footer">
       MUSIC
     </div>
 
+
   </div>
 
-
-  <!-- ملف الموسيقى -->
-  <script src="music.js"></script>
 
 
   <script>
 
     const moods = [
+
       {
         name: "هادئ",
         description: "نغمات كاليمبا هادئة"
@@ -318,6 +344,7 @@
         name: "متوتر",
         description: "نغمات كاليمبا بطيئة ومريحة"
       }
+
     ];
 
 
@@ -328,15 +355,19 @@
 
       currentMood = index;
 
+
       document.getElementById("mood").textContent =
         moods[index].name;
+
 
       document.getElementById("description").textContent =
         moods[index].description;
 
 
       if (typeof changeMood === "function") {
+
         changeMood(index);
+
       }
 
     }
@@ -347,7 +378,9 @@
       currentMood++;
 
       if (currentMood >= moods.length) {
+
         currentMood = 0;
+
       }
 
       selectMood(currentMood);
@@ -360,7 +393,9 @@
       currentMood--;
 
       if (currentMood < 0) {
+
         currentMood = moods.length - 1;
+
       }
 
       selectMood(currentMood);
@@ -377,20 +412,36 @@
         document.getElementById("status");
 
 
-      if (typeof musicPlaying !== "undefined" && musicPlaying) {
+      if (
+        typeof musicPlaying === "undefined"
+      ) {
+
+        status.textContent =
+          "ملف الموسيقى غير متصل";
+
+        return;
+
+      }
+
+
+      if (musicPlaying) {
 
         stopMusic();
 
-        button.textContent = "▶";
+        button.textContent =
+          "▶";
 
         status.textContent =
           "الموسيقى متوقفة";
 
-      } else {
+      }
+
+      else {
 
         startMusic(currentMood);
 
-        button.textContent = "⏸";
+        button.textContent =
+          "⏸";
 
         status.textContent =
           "الموسيقى تعمل";
@@ -401,6 +452,12 @@
 
   </script>
 
+
+
+  <!-- الربط مع ملف الموسيقى -->
+  <script src="./music.js"></script>
+
+
 </body>
 
-  </html>
+</html>
