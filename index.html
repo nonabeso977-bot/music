@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Music</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #fffaf5;
+      color: #777;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 390px;
+      min-height: 100vh;
+
+      padding: 35px 25px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo {
+      margin-top: 25px;
+
+      font-size: 34px;
+      font-weight: bold;
+      letter-spacing: 5px;
+
+      color: #777;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .player {
+      width: 100%;
+
+      margin-top: 60px;
+
+      padding: 25px 20px;
+
+      border-radius: 25px;
+
+      background: #fff0c9;
+
+      text-align: center;
+    }
+
+    .kalimba {
+      width: 150px;
+      height: 150px;
+
+      margin: 0 auto 25px;
+
+      border-radius: 50%;
+
+      background: #f2cf91;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      font-size: 55px;
+
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .mood {
+      font-size: 22px;
+      color: #777;
+
+      margin-bottom: 8px;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .controls {
+      display: flex;
+
+      justify-content: center;
+      align-items: center;
+
+      gap: 15px;
+
+      margin-top: 30px;
+    }
+
+    .control {
+      width: 50px;
+      height: 50px;
+
+      border: none;
+      border-radius: 50%;
+
+      background: #b9d8c2;
+
+      color: white;
+
+      font-size: 20px;
+
+      cursor: pointer;
+    }
+
+    .play {
+      width: 65px;
+      height: 65px;
+
+      background: #f2cf91;
+
+      font-size: 25px;
+    }
+
+    .status {
+      margin-top: 20px;
+
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .moods {
+      width: 100%;
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 12px;
+
+      margin-top: 25px;
+    }
+
+    .moodButton {
+      border: none;
+
+      padding: 15px 10px;
+
+      border-radius: 18px;
+
+      background: #f4e6d8;
+
+      color: #777;
+
+      font-size: 15px;
+
+      cursor: pointer;
+    }
+
+    .moodButton:active,
+    .control:active {
+      transform: scale(0.95);
+    }
+
+    .footer {
+      margin-top: auto;
+
+      padding-top: 40px;
+
+      font-size: 12px;
+
+      color: #bbb;
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <div class="app">
+
+    <div>
+      <div class="logo">
+        MUSIC
+      </div>
+
+      <div class="subtitle">
+        موسيقى على حسب مزاجك
+      </div>
+    </div>
+
+
+    <div class="player">
+
+      <div class="kalimba">
+        ♫
+      </div>
+
+
+      <div class="mood" id="mood">
+        هادئ
+      </div>
+
+
+      <div class="description" id="description">
+        نغمات كاليمبا هادئة
+      </div>
+
+
+      <div class="controls">
+
+        <button
+          class="control"
+          onclick="previousMood()">
+          ‹
+        </button>
+
+
+        <button
+          class="control play"
+          id="playButton"
+          onclick="toggleMusic()">
+          ▶
+        </button>
+
+
+        <button
+          class="control"
+          onclick="nextMood()">
+          ›
+        </button>
+
+      </div>
+
+
+      <div class="status" id="status">
+        الموسيقى متوقفة
+      </div>
+
+    </div>
+
+
+    <div class="moods">
+
+      <button
+        class="moodButton"
+        onclick="selectMood(0)">
+        🌿 هادئ
+      </button>
+
+
+      <button
+        class="moodButton"
+        onclick="selectMood(1)">
+        🌧️ حزين
+      </button>
+
+
+      <button
+        class="moodButton"
+        onclick="selectMood(2)">
+        ☀️ سعيد
+      </button>
+
+
+      <button
+        class="moodButton"
+        onclick="selectMood(3)">
+        🌙 متوتر
+      </button>
+
+    </div>
+
+
+    <div class="footer">
+      MUSIC
+    </div>
+
+  </div>
+
+
+  <!-- ملف الموسيقى -->
+  <script src="music.js"></script>
+
+
+  <script>
+
+    const moods = [
+      {
+        name: "هادئ",
+        description: "نغمات كاليمبا هادئة"
+      },
+
+      {
+        name: "حزين",
+        description: "نغمات كاليمبا ناعمة وبطيئة"
+      },
+
+      {
+        name: "سعيد",
+        description: "نغمات كاليمبا مشرقة وخفيفة"
+      },
+
+      {
+        name: "متوتر",
+        description: "نغمات كاليمبا بطيئة ومريحة"
+      }
+    ];
+
+
+    let currentMood = 0;
+
+
+    function selectMood(index) {
+
+      currentMood = index;
+
+      document.getElementById("mood").textContent =
+        moods[index].name;
+
+      document.getElementById("description").textContent =
+        moods[index].description;
+
+
+      if (typeof changeMood === "function") {
+        changeMood(index);
+      }
+
+    }
+
+
+    function nextMood() {
+
+      currentMood++;
+
+      if (currentMood >= moods.length) {
+        currentMood = 0;
+      }
+
+      selectMood(currentMood);
+
+    }
+
+
+    function previousMood() {
+
+      currentMood--;
+
+      if (currentMood < 0) {
+        currentMood = moods.length - 1;
+      }
+
+      selectMood(currentMood);
+
+    }
+
+
+    function toggleMusic() {
+
+      const button =
+        document.getElementById("playButton");
+
+      const status =
+        document.getElementById("status");
+
+
+      if (typeof musicPlaying !== "undefined" && musicPlaying) {
+
+        stopMusic();
+
+        button.textContent = "▶";
+
+        status.textContent =
+          "الموسيقى متوقفة";
+
+      } else {
+
+        startMusic(currentMood);
+
+        button.textContent = "⏸";
+
+        status.textContent =
+          "الموسيقى تعمل";
+
+      }
+
+    }
+
+  </script>
+
+</body>
+
+  </html>
